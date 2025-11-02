@@ -1,28 +1,40 @@
 #include <Servo.h>
 
-Servo motor1;
-Servo motor2;
+Servo servo1;
+Servo servo2;
 
 int minAngle = 0;
 int maxAngle = 90;
-int stepSize = 1;
-int delayTime = 30;    
+float stepSize = 1;
+int delayTime = 15;    
+
+unsigned long previousMillis = 0;
+float currentPos = 0;
+int direction = 1;
 
 void setup() {
-  motor1.attach(13);
-  motor2.attach(12);
+  servo1.attach(13);
+  servo2.attach(12);
 }
 
 void loop() {
-  for (float pos = minAngle; pos <= maxAngle; pos += stepSize) {
-    motor1.write(pos);
-    motor2.write(maxAngle - pos);
-    delay(delayTime);
-  }
+  unsigned long currentMillis = millis();
 
-  for (float pos = maxAngle; pos >= minAngle; pos -= stepSize) {
-    motor1.write(pos);
-    motor2.write(maxAngle - pos);
-    delay(delayTime);
+  if (currentMillis - previousMillis >= delayTime) {
+    previousMillis = currentMillis;
+
+    servo1.write(currentPos);
+    servo2.write(maxAngle - currentPos);
+
+    currentPos += direction * stepSize;
+
+    if (currentPos >= maxAngle) {
+      currentPos = maxAngle;
+      direction = -1;
+    } 
+    else if (currentPos <= minAngle) {
+      currentPos = minAngle;
+      direction = 1;
+    }
   }
 }
